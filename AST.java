@@ -18,38 +18,12 @@ class Start extends AST{
     Start(List<DataTypeDef> datatypedefs){
 	this.datatypedefs=datatypedefs;
     }
-    public String returnString = "";
-    public String indent = "    ";
     public String translate(){
-        returnString += "import java.util.*;\nabstract class AST{}\n\n";
+    	String returnString = "";
+    	String indent = "    ";
+		returnString += "import java.util.*;\nabstract class AST{}\n\n";
     	for (DataTypeDef data : datatypedefs) {
-            returnString += "abstract class " + data.dataTypeName + " extends AST {\n" + indent;
-            returnString += "public abstract " + data.functionHead + ";\n" + "}\n\n";
-            for (Alternative alt : data.alternatives) {
-                    returnString += "class " + alt.constructor + " extends " + data.dataTypeName+"{\n";
-                    returnString += indent;
-                    for (Argument arg : alt.arguments) {
-                        returnString += arg.type + " " + arg.name +";\n";
-                        returnString += indent;
-                    }
-                    returnString += alt.constructor +"(";
-                    for (Argument arg : alt.arguments) {
-                        if(!(arg.equals(alt.arguments.get(alt.arguments.size() - 1)))) {
-                            returnString += arg.type + " " + arg.name + ", ";
-                        }
-                        else {
-                            returnString += arg.type + " " + arg.name + ")";
-                        }
-                    }
-                    returnString += "{";
-                    for (Argument arg : alt.arguments) {
-                        returnString += "this." + arg.name + "=" + arg.name + "; ";
-                    }
-                    returnString += "}\n" + indent;
-                    returnString += "public " + data.functionHead + alt.code +"\n";
-                    returnString += "}";
-                    returnString += "\n\n";
-            }
+    		returnString += data.translate();
         }
         return returnString;
     }
@@ -64,6 +38,22 @@ class DataTypeDef extends AST{
 	this.functionHead=functionHead;
 	this.alternatives=alternatives;
     }
+    public String translate(){
+    		String returnString = "";
+    		String indent = "    ";
+    		returnString += "abstract class " + dataTypeName + " extends AST {\n" + indent;
+            returnString += "public abstract " + functionHead + ";\n" + "}\n\n";
+            for (Alternative alt : alternatives) {
+                    returnString += "class " + alt.constructor + " extends " + dataTypeName+"{\n";
+                    returnString += indent;
+                    returnString += alt.translate();
+                    returnString += "}\n" + indent;
+                    returnString += "public " + functionHead + alt.code +"\n";
+                    returnString += "}";
+                    returnString += "\n\n";
+        }
+        return returnString;
+    }
 }
 
 class Alternative extends AST{
@@ -75,10 +65,29 @@ class Alternative extends AST{
 	this.arguments=arguments;
 	this.code=code;
     }
+    public String translate() {
+    	String returnString = "";
+    	String indent = "    ";
+    	for(Argument arg : arguments) {
+    		returnString += arg.type + " " + arg.name + ";\n";
+    		returnString += indent;
+    	}
+    	returnString += constructor + "(";
+    	for (Argument arg : arguments) {
+    		if(!(arg.equals(arguments.get(arguments.size() - 1))))  returnString += arg.type + " " + arg.name + ", ";
+    		else returnString += arg.type + " " + arg.name + ")";
+    	}
+    	returnString += "{";
+    	for (Argument arg : arguments) {
+    		returnString += "this." + arg.name + "=" + arg.name + "; ";
+    	}
+    	return returnString;
+    }
 }
 
 class Argument extends AST{
     public String type;
     public String name;
     Argument(String type, String name){this.type=type; this.name=name;}
+    public String translate() {return "";}
 }

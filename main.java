@@ -69,7 +69,10 @@ class ASTMaker extends AbstractParseTreeVisitor<AST> implements cocoVisitor<AST>
 	List<Argument> list=new ArrayList<Argument>();
 	for(cocoParser.ArgumentContext c: ctx.as.as)
 	    list.add((Argument)visit(c));
-	return new Alternative(ctx.cons.getText(),list,ctx.code.getText());
+	String code = ctx.code.getText();
+	code = code.replace("^", "{");
+	code = code.replace("~", "}");
+	return new Alternative(ctx.cons.getText(),list,code);
     }
     public AST visitAlternatives(cocoParser.AlternativesContext ctx){
 	return null;//shouldn't be called directly
